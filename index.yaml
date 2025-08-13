@@ -3,12 +3,12 @@ entries:
   argo-app-chart:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2025-08-13T02:35:47.8098579+01:00"
+    created: "2025-08-13T03:43:43.0020124+01:00"
     description: A Helm chart for Kubernetes
     digest: 4a8e54bd661a93993218194b3fd01e8a8b22c6a93d908d3ed60e55cf597a8eef
     name: argo-app-chart
     type: application
     urls:
-    - https://<your-github-username>.github.io/%3Crepository-name%3E/argo-app-chart-0.1.0.tgz
+    - https://reel010.github.io/helmchart/argo-app-chart-0.1.0.tgz
     version: 0.1.0
-generated: "2025-08-13T02:35:47.8098579+01:00"
+generated: "2025-08-13T03:43:42.9964051+01:00"
