@@ -11,34 +11,35 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Checkout the repository
+      # Step 1: Checkout repository with full history
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # Step 2: Run GitLeaks secret scan
+      # Step 2: Run GitLeaks to scan for secrets
       - name: Run GitLeaks Secret Scan
         uses: zricethezav/gitleaks-action@v2
         with:
           verbose: true
 
-      # Step 3: Scan Helm Chart using Trivy
-      - name: Scan Helm Chart with Trivy
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: helm            # Scan Helm chart content
-          scan-ref: .
-          exit-code: 1               # Fail if vulnerabilities found
-          format: 'table'
+      # Step 3: Install Trivy
+      - name: Install Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
+          | sh -s -- -b /usr/local/bin
 
-      # Step 4: Configure Git for chart-releaser commits
+      # Step 4: Scan Helm chart directory with Trivy (config scan)
+      - name: Scan Helm Chart with Trivy
+        run: trivy config .
+
+      # Step 5: Configure Git for chart-releaser commits
       - name: Configure Git
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
-      # Step 5: Run Chart Releaser Action to publish Helm charts
+      # Step 6: Run Chart Releaser Action to publish Helm charts
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.7.0
         env:
