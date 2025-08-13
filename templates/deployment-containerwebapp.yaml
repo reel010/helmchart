@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: containerwebapp
+spec:
+  replicas: {{ .Values.containerwebapp.replicaCount }}
+  selector:
+    matchLabels:
+      app: containerwebapp
+  template:
+    metadata:
+      labels:
+        app: containerwebapp
+    spec:
+      imagePullSecrets:
+        - name: {{ .Values.containerwebapp.imagePullSecret }}
+      containers:
+        - name: containerwebapp
+          image: "{{ .Values.containerwebapp.image.repository }}:{{ .Values.containerwebapp.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.containerwebapp.containerPort }}
+          env:
+            - name: OANDA_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.containerwebapp.secrets.oandaToken.name }}
+                  key: {{ .Values.containerwebapp.secrets.oandaToken.key }}
+            - name: OANDA_API_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.containerwebapp.secrets.oandaApiUrl.name }}
+                  key: {{ .Values.containerwebapp.secrets.oandaApiUrl.key }}
+          volumeMounts:
+            - mountPath: /db
+              name: dbdata
+      volumes:
+        - name: dbdata
+          persistentVolumeClaim:
+            claimName: {{ .Values.containerwebapp.pvc.claimName }}

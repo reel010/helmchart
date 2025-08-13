@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: my-playwright-app
+spec:
+  schedule: "{{ .Values.cronjob.schedule }}"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          imagePullSecrets:
+            - name: {{ .Values.cronjob.imagePullSecret }}
+          containers:
+            - name: my-playwright-app
+              image: "{{ .Values.cronjob.image.repository }}:{{ .Values.cronjob.image.tag }}"
+              env:
+                - name: OPENAI_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.cronjob.secrets.openaiApiKey.name }}
+                      key: {{ .Values.cronjob.secrets.openaiApiKey.key }}
+              volumeMounts:
+                - mountPath: /db
+                  name: dbdata
+          volumes:
+            - name: dbdata
+              persistentVolumeClaim:
+                claimName: {{ .Values.cronjob.pvc.claimName }}
+          restartPolicy: Never

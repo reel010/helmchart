@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: containerdb-service
+spec:
+  selector:
+    app: containerdb
+  ports:
+    - port: {{ .Values.containerdb.service.port }}
+      targetPort: {{ .Values.containerdb.service.targetPort }}

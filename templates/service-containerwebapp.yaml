@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: containerwebapp-service
+spec:
+  selector:
+    app: containerwebapp
+  ports:
+    - port: {{ .Values.containerwebapp.service.port }}
+      targetPort: {{ .Values.containerwebapp.service.targetPort }}

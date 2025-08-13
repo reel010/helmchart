@@ -1,0 +1,89 @@
+# Default values for argo-app-chart
+# ---------------------------------
+
+# ----------------------
+# Ingress Configuration (for templates/ingress.yaml)
+# ----------------------
+ingress:
+  enabled: false
+  annotations: {}
+  hosts:
+    - host: example.com
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+# ----------------------
+# ServiceAccount configuration (templates/serviceaccount.yaml)
+# ----------------------
+serviceAccount:
+  create: true
+  name: ""                  # If empty, Helm auto-generates a name
+  annotations: {}           # Optional k8s annotations
+  automount: true           # Automount service account token
+
+# ----------------------
+# Autoscaling Configuration (templates/hpa.yaml)
+# ----------------------
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+
+# ----------------------
+# CronJob Configuration
+# ----------------------
+cronjob:
+  schedule: "*/15 * * * *"  # Every 15 minutes
+  imagePullSecret: "ghcr-secret"
+  image:
+    repository: "ghcr.io/reel010/containerrunner"
+    tag: "latest"
+  secrets:
+    openaiApiKey:
+      name: "app-secrets"
+      key: "OPENAI_API_KEY"
+  pvc:
+    claimName: "dbdata"
+
+# ----------------------
+# Container DB Deployment & Service
+# ----------------------
+containerdb:
+  replicaCount: 1
+  imagePullSecret: "ghcr-secret"
+  image:
+    repository: "ghcr.io/reel010/containerdb"
+    tag: "latest"
+  pvc:
+    claimName: "dbdata"
+  service:
+    type: ClusterIP
+    port: 5432
+    targetPort: 5432
+
+# ----------------------
+# Container Web App Deployment & Service
+# ----------------------
+containerwebapp:
+  replicaCount: 1
+  imagePullSecret: "ghcr-secret"
+  image:
+    repository: "ghcr.io/reel010/containerwebapp"
+    tag: "latest"
+  containerPort: 5000
+  secrets:
+    oandaToken:
+      name: "app-secrets"
+      key: "OANDA_TOKEN"
+    oandaApiUrl:
+      name: "app-secrets"
+      key: "OANDA_API_URL"
+  pvc:
+    claimName: "dbdata"
+  service:
+    type: ClusterIP
+    port: 8081
+    targetPort: 5000

@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: containerdb
+spec:
+  replicas: {{ .Values.containerdb.replicaCount }}
+  selector:
+    matchLabels:
+      app: containerdb
+  template:
+    metadata:
+      labels:
+        app: containerdb
+    spec:
+      imagePullSecrets:
+        - name: {{ .Values.containerdb.imagePullSecret }}
+      containers:
+        - name: containerdb
+          image: "{{ .Values.containerdb.image.repository }}:{{ .Values.containerdb.image.tag }}"
+          stdin: true
+          tty: true
+          volumeMounts:
+            - mountPath: /db
+              name: dbdata
+      volumes:
+        - name: dbdata
+          persistentVolumeClaim:
+            claimName: {{ .Values.containerdb.pvc.claimName }}
